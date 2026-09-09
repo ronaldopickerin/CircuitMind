@@ -82,11 +82,23 @@ def test_electrical_net_rejects_empty_id() -> None:
         )
 
 
-def test_electrical_net_requires_connection_point() -> None:
+def test_electrical_net_allows_wire_only_unresolved_net() -> None:
+    net = ElectricalNet(
+        id="net-unresolved-001",
+        connection_point_ids=(),
+        wire_segment_ids=("wire-page1-001",),
+    )
+
+    assert net.connection_point_ids == ()
+    assert net.wire_segment_ids == ("wire-page1-001",)
+
+
+def test_electrical_net_rejects_completely_empty_net() -> None:
     with pytest.raises(ValueError, match="at least one"):
         ElectricalNet(
             id="net-001",
             connection_point_ids=(),
+            wire_segment_ids=(),
         )
 
 

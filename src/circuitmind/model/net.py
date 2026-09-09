@@ -35,8 +35,10 @@ class ElectricalNet:
         if not self.id.strip():
             raise ValueError("Electrical net id must not be empty")
 
-        if not self.connection_point_ids:
-            raise ValueError("Electrical net must contain at least one connection point")
+        if not self.connection_point_ids and not self.wire_segment_ids:
+            raise ValueError(
+                "Electrical net must contain at least one connection point or wire segment"
+            )
 
         if any(not point_id.strip() for point_id in self.connection_point_ids):
             raise ValueError("Connection point ids must not be empty")

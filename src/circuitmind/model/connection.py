@@ -8,13 +8,11 @@ from circuitmind.model.source import SourceReference
 
 @dataclass(frozen=True, slots=True)
 class ConnectionPoint:
-    """A physical electrical endpoint that can participate in a net."""
+    """A logical electrical endpoint that can participate in a net."""
 
     id: str
     device_id: str
     label: str
-    position: Point2D
-    source: SourceReference
 
     def __post_init__(self) -> None:
         if not self.id.strip():
@@ -28,8 +26,22 @@ class ConnectionPoint:
 
 
 @dataclass(frozen=True, slots=True)
-class Terminal(ConnectionPoint):
-    """A connection point belonging to a terminal block."""
+class ConnectionPointOccurrence:
+    """A graphical occurrence of a logical connection point."""
+
+    id: str
+    connection_point_id: str
+    position: Point2D
+    source: SourceReference
 
     def __post_init__(self) -> None:
-        ConnectionPoint.__post_init__(self)
+        if not self.id.strip():
+            raise ValueError("Connection point occurrence id must not be empty")
+
+        if not self.connection_point_id.strip():
+            raise ValueError("connection_point_id must not be empty")
+
+
+@dataclass(frozen=True, slots=True)
+class Terminal(ConnectionPoint):
+    """A logical terminal belonging to a terminal block."""

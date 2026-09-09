@@ -34,7 +34,7 @@ class DigitalPLCAddress:
 
 @dataclass(frozen=True, slots=True)
 class PLCChannel(ConnectionPoint):
-    """A physical PLC channel associated with a structured address."""
+    """A logical PLC channel associated with a structured address."""
 
     address: DigitalPLCAddress
 

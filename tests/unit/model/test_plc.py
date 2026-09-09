@@ -1,15 +1,6 @@
 import pytest
 
-from circuitmind.model.geometry import Point2D
 from circuitmind.model.plc import DigitalPLCAddress, PLCArea, PLCChannel
-from circuitmind.model.source import SourceReference
-
-
-def make_source() -> SourceReference:
-    return SourceReference(
-        document_id="schematic.pdf",
-        page_number=1,
-    )
 
 
 def test_digital_plc_address_formats_input_address() -> None:
@@ -59,11 +50,9 @@ def test_plc_channel_accepts_matching_address_and_label() -> None:
     )
 
     channel = PLCChannel(
-        id="PLC1:I0.2",
-        device_id="PLC1",
+        id="plc1-input-0-2",
+        device_id="device-PLC1",
         label="I0.2",
-        position=Point2D(x=300.0, y=200.0),
-        source=make_source(),
         address=address,
     )
 
@@ -80,10 +69,8 @@ def test_plc_channel_rejects_mismatched_label() -> None:
 
     with pytest.raises(ValueError, match="label"):
         PLCChannel(
-            id="PLC1:I0.2",
-            device_id="PLC1",
+            id="plc1-input-0-2",
+            device_id="device-PLC1",
             label="I0.3",
-            position=Point2D(x=300.0, y=200.0),
-            source=make_source(),
             address=address,
         )

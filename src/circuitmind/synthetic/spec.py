@@ -54,6 +54,7 @@ class SyntheticWire:
     id: str
     start: SyntheticPoint
     end: SyntheticPoint
+    stroke_rgb: tuple[float, float, float] = (0.0, 0.0, 0.0)
 
     def __post_init__(self) -> None:
         if not self.id.strip():
@@ -61,6 +62,14 @@ class SyntheticWire:
 
         if self.start == self.end:
             raise ValueError("Synthetic wire must have non-zero length")
+
+        if len(self.stroke_rgb) != 3:
+            raise ValueError("Synthetic wire stroke_rgb must contain three channels")
+
+        if any(
+            not isfinite(channel) or channel < 0.0 or channel > 1.0 for channel in self.stroke_rgb
+        ):
+            raise ValueError("Synthetic wire RGB channels must be finite values between 0 and 1")
 
 
 @dataclass(frozen=True, slots=True)

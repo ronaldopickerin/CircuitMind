@@ -114,6 +114,51 @@ def test_wire_rejects_zero_length_segment() -> None:
         )
 
 
+def test_wire_defaults_to_black_stroke() -> None:
+    wire = SyntheticWire(
+        id="wire-1",
+        start=SyntheticPoint(100.0, 200.0),
+        end=SyntheticPoint(250.0, 200.0),
+    )
+
+    assert wire.stroke_rgb == (0.0, 0.0, 0.0)
+
+
+def test_wire_accepts_rgb_stroke_colour() -> None:
+    wire = SyntheticWire(
+        id="wire-1",
+        start=SyntheticPoint(100.0, 200.0),
+        end=SyntheticPoint(250.0, 200.0),
+        stroke_rgb=(0.0, 0.0, 1.0),
+    )
+
+    assert wire.stroke_rgb == (0.0, 0.0, 1.0)
+
+
+@pytest.mark.parametrize(
+    "stroke_rgb",
+    [
+        (-0.1, 0.0, 0.0),
+        (1.1, 0.0, 0.0),
+        (nan, 0.0, 0.0),
+        (inf, 0.0, 0.0),
+    ],
+)
+def test_wire_rejects_invalid_rgb_channels(
+    stroke_rgb: tuple[float, float, float],
+) -> None:
+    with pytest.raises(
+        ValueError,
+        match="RGB channels must be finite values between 0 and 1",
+    ):
+        SyntheticWire(
+            id="wire-1",
+            start=SyntheticPoint(100.0, 200.0),
+            end=SyntheticPoint(250.0, 200.0),
+            stroke_rgb=stroke_rgb,
+        )
+
+
 def test_page_rejects_duplicate_primitive_ids() -> None:
     page_point = SyntheticPoint(100.0, 200.0)
 

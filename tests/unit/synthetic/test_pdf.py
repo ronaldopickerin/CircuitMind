@@ -9,6 +9,7 @@ from circuitmind.synthetic.spec import (
     SyntheticPage,
     SyntheticPoint,
     SyntheticText,
+    SyntheticWire,
 )
 
 
@@ -131,6 +132,39 @@ def test_write_pdf_document_supports_multiple_pages(
 
     assert b"PAGE_ONE" in pdf_bytes
     assert b"PAGE_TWO" in pdf_bytes
+
+
+def test_write_pdf_document_preserves_wire_colour(
+    tmp_path: Path,
+) -> None:
+    document = SyntheticDocument(
+        id="coloured-wire",
+        filename="coloured_wire.pdf",
+        pages=(
+            SyntheticPage(
+                page_number=1,
+                width=842.0,
+                height=595.0,
+                wires=(
+                    SyntheticWire(
+                        id="blue-wire",
+                        start=SyntheticPoint(100.0, 200.0),
+                        end=SyntheticPoint(300.0, 200.0),
+                        stroke_rgb=(0.0, 0.0, 1.0),
+                    ),
+                ),
+            ),
+        ),
+    )
+
+    output_path = write_pdf_document(
+        document,
+        tmp_path,
+    )
+
+    pdf_bytes = output_path.read_bytes()
+
+    assert b"0 0 1 RG" in pdf_bytes
 
 
 def test_good_project_documents_can_all_be_rendered(

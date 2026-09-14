@@ -40,6 +40,8 @@ def write_pdf_document(
         pdf.setLineWidth(WIRE_WIDTH)
 
         for wire in page.wires:
+            pdf.setStrokeColorRGB(*wire.stroke_rgb)
+
             pdf.line(
                 wire.start.x,
                 wire.start.y,
@@ -47,6 +49,7 @@ def write_pdf_document(
                 wire.end.y,
             )
 
+        pdf.setStrokeColorRGB(0.0, 0.0, 0.0)
         pdf.setLineWidth(SYMBOL_LINE_WIDTH)
 
         for symbol in page.symbols:

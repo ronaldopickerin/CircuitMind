@@ -1,6 +1,9 @@
 """Deterministic synthetic electrical project definitions."""
 
+from dataclasses import replace
+
 from circuitmind.synthetic.spec import (
+    ExpectedFinding,
     IOSchedule,
     IOScheduleRow,
     SyntheticDocument,
@@ -144,4 +147,149 @@ def good_digital_input_case() -> SyntheticProjectCase:
     return SyntheticProjectCase(
         project=project,
         expected_findings=(),
+    )
+
+
+def duplicate_plc_address_case() -> SyntheticProjectCase:
+    """Build a project where two signals intentionally share one PLC address."""
+
+    good_case = good_digital_input_case()
+    project = good_case.project
+
+    control_document = project.documents[0]
+    plc_io_document = project.documents[1]
+    io_schedule = project.schedules[0]
+
+    control_page = control_document.pages[0]
+
+    duplicate_control_page = replace(
+        control_page,
+        symbols=control_page.symbols
+        + (
+            SyntheticSymbol(
+                id="sensor-b102",
+                kind="sensor",
+                label="-B102",
+                position=SyntheticPoint(120.0, 160.0),
+                width=80.0,
+                height=40.0,
+            ),
+            SyntheticSymbol(
+                id="terminal-x1-2",
+                kind="terminal",
+                label="-X1:2",
+                position=SyntheticPoint(340.0, 165.0),
+                width=60.0,
+                height=30.0,
+            ),
+        ),
+        wires=control_page.wires
+        + (
+            SyntheticWire(
+                id="wire-b102-x1-2",
+                start=SyntheticPoint(200.0, 180.0),
+                end=SyntheticPoint(340.0, 180.0),
+            ),
+        ),
+        texts=control_page.texts
+        + (
+            SyntheticText(
+                id="signal-name-b102",
+                text="B102_GUARD_CLOSED",
+                position=SyntheticPoint(220.0, 195.0),
+            ),
+            SyntheticText(
+                id="description-b102",
+                text="Guard closed sensor",
+                position=SyntheticPoint(120.0, 230.0),
+            ),
+        ),
+    )
+
+    plc_page = plc_io_document.pages[0]
+
+    duplicate_plc_page = replace(
+        plc_page,
+        symbols=plc_page.symbols
+        + (
+            SyntheticSymbol(
+                id="terminal-x1-2",
+                kind="terminal",
+                label="-X1:2",
+                position=SyntheticPoint(120.0, 165.0),
+                width=60.0,
+                height=30.0,
+            ),
+            SyntheticSymbol(
+                id="plc-input-b102",
+                kind="plc_input",
+                label="-A2",
+                position=SyntheticPoint(340.0, 160.0),
+                width=100.0,
+                height=40.0,
+            ),
+        ),
+        wires=plc_page.wires
+        + (
+            SyntheticWire(
+                id="wire-x1-2-plc",
+                start=SyntheticPoint(180.0, 180.0),
+                end=SyntheticPoint(340.0, 180.0),
+            ),
+        ),
+        texts=plc_page.texts
+        + (
+            SyntheticText(
+                id="signal-name-b102",
+                text="B102_GUARD_CLOSED",
+                position=SyntheticPoint(220.0, 195.0),
+            ),
+            SyntheticText(
+                id="plc-address-b102",
+                text="I2.3",
+                position=SyntheticPoint(370.0, 195.0),
+            ),
+            SyntheticText(
+                id="description-b102",
+                text="Guard closed sensor",
+                position=SyntheticPoint(340.0, 230.0),
+            ),
+        ),
+    )
+
+    duplicate_schedule = replace(
+        io_schedule,
+        rows=io_schedule.rows
+        + (
+            IOScheduleRow(
+                signal="B102_GUARD_CLOSED",
+                plc_address="I2.3",
+                description="Guard closed sensor",
+            ),
+        ),
+    )
+
+    duplicate_project = replace(
+        project,
+        id="duplicate_plc_address_project",
+        documents=(
+            replace(
+                control_document,
+                pages=(duplicate_control_page,),
+            ),
+            replace(
+                plc_io_document,
+                pages=(duplicate_plc_page,),
+            ),
+        ),
+        schedules=(duplicate_schedule,),
+    )
+
+    return SyntheticProjectCase(
+        project=duplicate_project,
+        expected_findings=(
+            ExpectedFinding(
+                rule_id="CM-R001",
+            ),
+        ),
     )

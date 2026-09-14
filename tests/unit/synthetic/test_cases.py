@@ -1,6 +1,9 @@
 """Tests for deterministic synthetic electrical project cases."""
 
-from circuitmind.synthetic.cases import good_digital_input_case
+from circuitmind.synthetic.cases import (
+    duplicate_plc_address_case,
+    good_digital_input_case,
+)
 
 
 def test_good_digital_input_project_contains_multiple_documents() -> None:
@@ -77,3 +80,61 @@ def test_good_digital_input_project_aligns_plc_address_with_schedule() -> None:
 
     assert schedule.rows[0].plc_address == "I2.3"
     assert "I2.3" in plc_text
+
+
+def test_duplicate_plc_address_case_expects_cm_r001() -> None:
+    case = duplicate_plc_address_case()
+
+    assert tuple(finding.rule_id for finding in case.expected_findings) == ("CM-R001",)
+
+
+def test_duplicate_plc_address_case_contains_two_distinct_signals() -> None:
+    case = duplicate_plc_address_case()
+    schedule = case.project.schedules[0]
+
+    assert [row.signal for row in schedule.rows] == [
+        "B101_HOME",
+        "B102_GUARD_CLOSED",
+    ]
+
+
+def test_duplicate_plc_address_case_duplicates_schedule_address() -> None:
+    case = duplicate_plc_address_case()
+    schedule = case.project.schedules[0]
+
+    assert [row.plc_address for row in schedule.rows] == [
+        "I2.3",
+        "I2.3",
+    ]
+
+
+def test_duplicate_plc_address_case_duplicates_address_on_drawing() -> None:
+    case = duplicate_plc_address_case()
+    plc_page = case.project.documents[1].pages[0]
+
+    addresses = [text.text for text in plc_page.texts if text.text == "I2.3"]
+
+    assert addresses == [
+        "I2.3",
+        "I2.3",
+    ]
+
+
+def test_duplicate_plc_address_case_keeps_cross_document_signals_aligned() -> None:
+    case = duplicate_plc_address_case()
+    project = case.project
+
+    control_text = {text.text for text in project.documents[0].pages[0].texts}
+
+    plc_text = {text.text for text in project.documents[1].pages[0].texts}
+
+    schedule_signals = {row.signal for row in project.schedules[0].rows}
+
+    expected_signals = {
+        "B101_HOME",
+        "B102_GUARD_CLOSED",
+    }
+
+    assert expected_signals <= control_text
+    assert expected_signals <= plc_text
+    assert schedule_signals == expected_signals

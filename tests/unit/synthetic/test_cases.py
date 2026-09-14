@@ -4,6 +4,7 @@ from circuitmind.synthetic.cases import (
     dangling_connection_case,
     duplicate_plc_address_case,
     good_digital_input_case,
+    schedule_mismatch_case,
 )
 
 
@@ -182,3 +183,42 @@ def test_dangling_connection_case_preserves_other_project_sources() -> None:
 
     assert dangling_case.project.documents[1] == good_case.project.documents[1]
     assert dangling_case.project.schedules == good_case.project.schedules
+
+
+def test_schedule_mismatch_case_expects_cm_r003() -> None:
+    case = schedule_mismatch_case()
+
+    assert case.project.id == "schedule_mismatch_project"
+
+    assert tuple(finding.rule_id for finding in case.expected_findings) == ("CM-R003",)
+
+
+def test_schedule_mismatch_case_preserves_drawing_address() -> None:
+    case = schedule_mismatch_case()
+    plc_page = case.project.documents[1].pages[0]
+
+    plc_text = {text.text for text in plc_page.texts}
+
+    assert "I2.3" in plc_text
+    assert "I2.4" not in plc_text
+
+
+def test_schedule_mismatch_case_changes_schedule_address() -> None:
+    case = schedule_mismatch_case()
+    schedule = case.project.schedules[0]
+
+    assert len(schedule.rows) == 1
+
+    row = schedule.rows[0]
+
+    assert row.signal == "B101_HOME"
+    assert row.plc_address == "I2.4"
+    assert row.description == "Conveyor home sensor"
+
+
+def test_schedule_mismatch_case_preserves_drawing_documents() -> None:
+    good_case = good_digital_input_case()
+    mismatch_case = schedule_mismatch_case()
+
+    assert mismatch_case.project.documents == good_case.project.documents
+    assert mismatch_case.project.schedules != good_case.project.schedules

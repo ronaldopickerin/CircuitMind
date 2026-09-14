@@ -337,3 +337,38 @@ def dangling_connection_case() -> SyntheticProjectCase:
             ),
         ),
     )
+
+
+def schedule_mismatch_case() -> SyntheticProjectCase:
+    """Build a project where the I/O schedule disagrees with the PLC drawing."""
+
+    good_case = good_digital_input_case()
+    project = good_case.project
+
+    io_schedule = project.schedules[0]
+    source_row = io_schedule.rows[0]
+
+    mismatched_schedule = replace(
+        io_schedule,
+        rows=(
+            replace(
+                source_row,
+                plc_address="I2.4",
+            ),
+        ),
+    )
+
+    mismatched_project = replace(
+        project,
+        id="schedule_mismatch_project",
+        schedules=(mismatched_schedule,),
+    )
+
+    return SyntheticProjectCase(
+        project=mismatched_project,
+        expected_findings=(
+            ExpectedFinding(
+                rule_id="CM-R003",
+            ),
+        ),
+    )

@@ -161,3 +161,21 @@ def test_discovered_sources_exposes_all_source_paths() -> None:
         "drawings/plc_io.pdf",
         "io_schedule.csv",
     )
+
+
+@pytest.mark.parametrize(
+    "source_path",
+    [
+        "/drawings/control.pdf",
+        "../control.pdf",
+        "drawings/../control.pdf",
+        "C:/drawings/control.pdf",
+    ],
+)
+def test_discovered_sources_reject_invalid_source_paths(
+    source_path: str,
+) -> None:
+    with pytest.raises(ValueError):
+        DiscoveredProjectSources(
+            pdf_paths=(source_path,),
+        )

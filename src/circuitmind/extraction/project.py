@@ -3,6 +3,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+from circuitmind.extraction.spec import _require_relative_source_path
+
 
 @dataclass(frozen=True, slots=True)
 class DiscoveredProjectSources:
@@ -12,6 +14,12 @@ class DiscoveredProjectSources:
     csv_paths: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
+        for path in self.pdf_paths:
+            _require_relative_source_path(path)
+
+        for path in self.csv_paths:
+            _require_relative_source_path(path)
+
         if any(not path.lower().endswith(".pdf") for path in self.pdf_paths):
             raise ValueError("Discovered PDF paths must end with .pdf")
 

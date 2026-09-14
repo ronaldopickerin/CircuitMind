@@ -38,6 +38,8 @@ def test_extracted_bounding_box_requires_ordered_coordinates() -> None:
     [
         "",
         "C:\\drawings\\control.pdf",
+        "C:/drawings/control.pdf",
+        "C:drawings/control.pdf",
         "/drawings/control.pdf",
         "../control.pdf",
         "drawings/../control.pdf",

@@ -8,7 +8,7 @@ interpreted CircuitMind electrical-domain entities.
 
 from dataclasses import dataclass
 from math import isfinite
-from pathlib import PurePosixPath
+from pathlib import PurePosixPath, PureWindowsPath
 
 RGB = tuple[float, float, float]
 
@@ -255,6 +255,9 @@ def _require_relative_source_path(source_path: str) -> None:
 
     if "\\" in source_path:
         raise ValueError("Source path must use forward slashes")
+
+    if PureWindowsPath(source_path).drive:
+        raise ValueError("Source path must not contain a drive")
 
     path = PurePosixPath(source_path)
 

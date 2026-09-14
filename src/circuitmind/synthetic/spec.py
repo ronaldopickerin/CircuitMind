@@ -1,4 +1,7 @@
-"""Source specifications for deterministic synthetic electrical projects."""
+"""Source specifications for deterministic synthetic electrical projects.
+
+Drawing coordinates use PDF points with the origin at the bottom-left of the page.
+"""
 
 from dataclasses import dataclass
 from math import isfinite
@@ -187,7 +190,6 @@ class SyntheticProject:
     id: str
     documents: tuple[SyntheticDocument, ...]
     schedules: tuple[IOSchedule, ...] = ()
-    expected_findings: tuple[ExpectedFinding, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.id.strip():
@@ -212,3 +214,11 @@ class SyntheticProject:
 
         if len(schedule_filenames) != len(set(schedule_filenames)):
             raise ValueError("Synthetic project schedule filenames must be unique")
+
+
+@dataclass(frozen=True, slots=True)
+class SyntheticProjectCase:
+    """A synthetic project paired with the findings CircuitMind should produce."""
+
+    project: SyntheticProject
+    expected_findings: tuple[ExpectedFinding, ...] = ()

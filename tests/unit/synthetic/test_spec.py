@@ -12,6 +12,7 @@ from circuitmind.synthetic.spec import (
     SyntheticPage,
     SyntheticPoint,
     SyntheticProject,
+    SyntheticProjectCase,
     SyntheticSymbol,
     SyntheticText,
     SyntheticWire,
@@ -326,7 +327,13 @@ def test_schedule_mismatch_remains_representable() -> None:
                 ),
             ),
         ),
+    )
+
+    case = SyntheticProjectCase(
+        project=project,
         expected_findings=(ExpectedFinding(rule_id="CM-R003"),),
     )
 
-    assert project.expected_findings == (ExpectedFinding(rule_id="CM-R003"),)
+    assert project.schedules[0].rows[0].plc_address == "I2.4"
+    assert page.texts[0].text == "I2.3"
+    assert case.expected_findings == (ExpectedFinding(rule_id="CM-R003"),)

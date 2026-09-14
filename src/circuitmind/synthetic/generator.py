@@ -4,6 +4,7 @@ import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
+from circuitmind.synthetic.cases import all_synthetic_cases
 from circuitmind.synthetic.manifest import write_case_manifest
 from circuitmind.synthetic.pdf import write_pdf_document
 from circuitmind.synthetic.schedule import write_io_schedule
@@ -75,6 +76,20 @@ def generate_project_case(
         document_paths=document_paths,
         schedule_paths=schedule_paths,
         manifest_path=manifest_path,
+    )
+
+
+def generate_all_project_cases(
+    output_root: Path,
+) -> tuple[GeneratedSyntheticCase, ...]:
+    """Generate every built-in synthetic project case in deterministic order."""
+
+    return tuple(
+        generate_project_case(
+            case,
+            output_root,
+        )
+        for case in all_synthetic_cases()
     )
 
 

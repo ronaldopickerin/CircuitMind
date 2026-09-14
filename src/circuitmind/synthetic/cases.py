@@ -372,3 +372,14 @@ def schedule_mismatch_case() -> SyntheticProjectCase:
             ),
         ),
     )
+
+
+def all_synthetic_cases() -> tuple[SyntheticProjectCase, ...]:
+    """Return every built-in synthetic project case in deterministic order."""
+
+    return (
+        good_digital_input_case(),
+        duplicate_plc_address_case(),
+        dangling_connection_case(),
+        schedule_mismatch_case(),
+    )

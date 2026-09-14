@@ -5,7 +5,10 @@ from pathlib import Path
 import pytest
 
 from circuitmind.synthetic.cases import good_digital_input_case
-from circuitmind.synthetic.generator import generate_project_case
+from circuitmind.synthetic.generator import (
+    generate_all_project_cases,
+    generate_project_case,
+)
 from circuitmind.synthetic.spec import (
     SyntheticDocument,
     SyntheticPage,
@@ -171,3 +174,52 @@ def test_generated_case_is_reproducible_across_output_directories(
     }
 
     assert first_files == second_files
+
+
+def test_generate_all_project_cases_creates_complete_suite(
+    tmp_path: Path,
+) -> None:
+    generated_cases = generate_all_project_cases(tmp_path)
+
+    assert tuple(generated.case_directory.name for generated in generated_cases) == (
+        "good_digital_input_project",
+        "duplicate_plc_address_project",
+        "dangling_connection_project",
+        "schedule_mismatch_project",
+    )
+
+
+def test_generate_all_project_cases_creates_every_artifact(
+    tmp_path: Path,
+) -> None:
+    generated_cases = generate_all_project_cases(tmp_path)
+
+    assert len(generated_cases) == 4
+
+    for generated in generated_cases:
+        assert generated.case_directory.is_dir()
+        assert generated.project_directory.is_dir()
+        assert generated.drawings_directory.is_dir()
+
+        assert all(path.is_file() for path in generated.document_paths)
+
+        assert all(path.is_file() for path in generated.schedule_paths)
+
+        assert generated.manifest_path.is_file()
+
+
+def test_generate_all_project_cases_keeps_oracles_outside_projects(
+    tmp_path: Path,
+) -> None:
+    generated_cases = generate_all_project_cases(tmp_path)
+
+    for generated in generated_cases:
+        assert generated.manifest_path.parent == (generated.case_directory)
+
+        assert generated.manifest_path.parent != (generated.project_directory)
+
+        project_files = {
+            path.name for path in generated.project_directory.rglob("*") if path.is_file()
+        }
+
+        assert "manifest.json" not in project_files

@@ -1,6 +1,7 @@
 """Tests for deterministic synthetic electrical project cases."""
 
 from circuitmind.synthetic.cases import (
+    all_synthetic_cases,
     dangling_connection_case,
     duplicate_plc_address_case,
     good_digital_input_case,
@@ -222,3 +223,29 @@ def test_schedule_mismatch_case_preserves_drawing_documents() -> None:
 
     assert mismatch_case.project.documents == good_case.project.documents
     assert mismatch_case.project.schedules != good_case.project.schedules
+
+
+def test_all_synthetic_cases_returns_complete_suite() -> None:
+    cases = all_synthetic_cases()
+
+    assert tuple(case.project.id for case in cases) == (
+        "good_digital_input_project",
+        "duplicate_plc_address_project",
+        "dangling_connection_project",
+        "schedule_mismatch_project",
+    )
+
+
+def test_all_synthetic_cases_have_expected_findings() -> None:
+    cases = all_synthetic_cases()
+
+    expected_rule_ids = tuple(
+        tuple(finding.rule_id for finding in case.expected_findings) for case in cases
+    )
+
+    assert expected_rule_ids == (
+        (),
+        ("CM-R001",),
+        ("CM-R002",),
+        ("CM-R003",),
+    )

@@ -1,6 +1,7 @@
 """Tests for deterministic synthetic electrical project cases."""
 
 from circuitmind.synthetic.cases import (
+    dangling_connection_case,
     duplicate_plc_address_case,
     good_digital_input_case,
 )
@@ -138,3 +139,46 @@ def test_duplicate_plc_address_case_keeps_cross_document_signals_aligned() -> No
     assert expected_signals <= control_text
     assert expected_signals <= plc_text
     assert schedule_signals == expected_signals
+
+
+def test_dangling_connection_case_expects_cm_r002() -> None:
+    case = dangling_connection_case()
+
+    assert case.project.id == "dangling_connection_project"
+
+    assert tuple(finding.rule_id for finding in case.expected_findings) == ("CM-R002",)
+
+
+def test_dangling_connection_case_wire_stops_short_of_terminal() -> None:
+    case = dangling_connection_case()
+    control_page = case.project.documents[0].pages[0]
+
+    wire = next(wire for wire in control_page.wires if wire.id == "wire-b101-x1-1")
+
+    terminal = next(symbol for symbol in control_page.symbols if symbol.id == "terminal-x1-1")
+
+    assert wire.end.y == 300.0
+    assert terminal.position.y <= wire.end.y <= (terminal.position.y + terminal.height)
+
+    assert wire.end.x < terminal.position.x
+    assert terminal.position.x - wire.end.x == 25.0
+
+
+def test_dangling_connection_case_preserves_other_control_content() -> None:
+    good_case = good_digital_input_case()
+    dangling_case = dangling_connection_case()
+
+    good_page = good_case.project.documents[0].pages[0]
+    dangling_page = dangling_case.project.documents[0].pages[0]
+
+    assert dangling_page.symbols == good_page.symbols
+    assert dangling_page.texts == good_page.texts
+    assert dangling_page.wires != good_page.wires
+
+
+def test_dangling_connection_case_preserves_other_project_sources() -> None:
+    good_case = good_digital_input_case()
+    dangling_case = dangling_connection_case()
+
+    assert dangling_case.project.documents[1] == good_case.project.documents[1]
+    assert dangling_case.project.schedules == good_case.project.schedules

@@ -293,3 +293,47 @@ def duplicate_plc_address_case() -> SyntheticProjectCase:
             ),
         ),
     )
+
+
+def dangling_connection_case() -> SyntheticProjectCase:
+    """Build a project containing one visually disconnected wire endpoint."""
+
+    good_case = good_digital_input_case()
+    project = good_case.project
+
+    control_document = project.documents[0]
+    plc_io_document = project.documents[1]
+
+    control_page = control_document.pages[0]
+    source_wire = control_page.wires[0]
+
+    dangling_wire = replace(
+        source_wire,
+        end=SyntheticPoint(315.0, 300.0),
+    )
+
+    dangling_control_page = replace(
+        control_page,
+        wires=(dangling_wire,),
+    )
+
+    dangling_project = replace(
+        project,
+        id="dangling_connection_project",
+        documents=(
+            replace(
+                control_document,
+                pages=(dangling_control_page,),
+            ),
+            plc_io_document,
+        ),
+    )
+
+    return SyntheticProjectCase(
+        project=dangling_project,
+        expected_findings=(
+            ExpectedFinding(
+                rule_id="CM-R002",
+            ),
+        ),
+    )

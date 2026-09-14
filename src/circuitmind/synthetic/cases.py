@@ -114,7 +114,7 @@ def good_digital_input_case() -> SyntheticProjectCase:
                     SyntheticText(
                         id="plc-address",
                         text="I2.3",
-                        position=SyntheticPoint(370.0, 315.0),
+                        position=SyntheticPoint(370.0, 330.0),
                     ),
                     SyntheticText(
                         id="description",
@@ -247,7 +247,7 @@ def duplicate_plc_address_case() -> SyntheticProjectCase:
             SyntheticText(
                 id="plc-address-b102",
                 text="I2.3",
-                position=SyntheticPoint(370.0, 195.0),
+                position=SyntheticPoint(370.0, 210.0),
             ),
             SyntheticText(
                 id="description-b102",

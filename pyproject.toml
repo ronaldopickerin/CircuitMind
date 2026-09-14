@@ -6,7 +6,9 @@ authors = [
     { name = "ronaldopickerin", email = "220242217+ronaldopickerin@users.noreply.github.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "reportlab>=5.0.1",
+]
 
 [project.scripts]
 circuitmind = "circuitmind.cli:main"

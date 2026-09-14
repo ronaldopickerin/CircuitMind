@@ -5,6 +5,7 @@ This directory is the durable project knowledge base for CircuitMind.
 ## Structure
 
 - `domain-model.md` — current electrical domain model and modelling principles.
+- `synthetic-projects.md` — deterministic synthetic project benchmark, source format, generated layout, and test-oracle architecture.
 - `roadmap.md` — high-level product and engineering direction.
 - `ideas/` — useful concepts worth preserving before they become scheduled work.
 - `decisions/` — architectural decisions and the reasoning behind them.
